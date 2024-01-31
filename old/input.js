@@ -2,7 +2,7 @@ class Terminal {
     constructor(output, username, hostname) {
         this.output = output;
         this.input = "";
-        
+
         this.username = username;
         this.hostname = hostname;
     }
@@ -18,28 +18,42 @@ class Terminal {
     read_keystroke(event) {
         switch (event.key) {
             case "Backspace":
-                this.output.innerText = this.output.innerText.slice(0, this.output.innerText.length - 1);
+                if (this.input.length > 0) {
+                    this.input = this.input.substring(0, this.input.length - 1);
+                    this.output.innerText = this.output.innerText.substring(0, this.output.length - 1);
+                }
                 break;
 
             case "Enter":
-                this.execute(this.output.innerText);
+                this.execute(this.input);
+                this.input = "";
                 this.output.innerText += "\n";
                 this.write_prompt();
                 break;
 
             default:
                 if (event.key.length == 1) {
+                    this.input += event.key;
                     this.output.innerText += event.key;
                 }
         }
     }   
+
+    execute(command) {
+        console.log(command);
+
+        switch (command) {
+            case "clear":
+                this.input = "";
+                this.output.innerText = "";
+        }
+    }
 }
 
 init = () => {
     let output = document.getElementById("terminal");
     let terminal = new Terminal(output, "username", "hostname");
 
-    // REPL loop
     terminal.write_prompt();
     document.onkeydown = (event) => {
         terminal.read_keystroke(event);
